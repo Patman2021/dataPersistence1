@@ -1,4 +1,4 @@
-package reiziger;
+package domein.reiziger;
 
 import java.sql.*;
 import java.util.ArrayList;
