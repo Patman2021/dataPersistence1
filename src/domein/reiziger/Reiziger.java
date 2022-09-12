@@ -46,8 +46,20 @@ public class Reiziger {
         return voorletters;
     }
 
+    public void adresToevoegenAanReiziger(Adres adres){
+        this.adres= adres;
+    }
+
+    public Adres getAdres() {
+        return adres;
+    }
+
+    public void adresVerwijderen(){
+        this.adres = null;
+    }
+
     @Override
     public String toString() {
-        return  this.id +": "+ getNaam() +". Geboren op:"+ geboortedatum.toString();
+        return   "reiziger {"+this.id +": "+ getNaam() +". Geboren op:"+ geboortedatum +" "+ adres +"}";
     }
 }

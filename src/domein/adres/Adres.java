@@ -11,6 +11,7 @@ public class Adres {
     private String straat;
     private  String woonplaats;
     private  int reizigerId;
+    private  Reiziger reiziger;
 
 
     public Adres(int id, String postcode, String huisnummer, String straat, String woonplaats, int reiziger){
@@ -21,6 +22,10 @@ public class Adres {
         this.woonplaats= woonplaats;
         this.reizigerId =reiziger;
 
+    }
+
+    public void setReiziger(Reiziger reiziger) {
+        this.reiziger = reiziger;
     }
 
     public int getId() {
@@ -49,6 +54,6 @@ public class Adres {
 
     @Override
     public String toString() {
-        return "#"+ reizigerId +",met adres_id="+id +": Postcode="+ postcode +", Huisnummer= "+ huisnummer;
+        return  " Adres{   #"+ reizigerId +",met adres_id="+id +": Postcode="+ postcode +", Huisnummer= "+ huisnummer +"}";
     }
 }

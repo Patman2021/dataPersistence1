@@ -17,7 +17,7 @@ public class Main {
     public static   void main(String [] args) throws SQLException {
         getconnection();
         testReizigerDAO(new ReizigerDAOPsql(connection));
-        testAdress(new AdressDAOPsql(connection));
+        testCrudAdress(new AdressDAOPsql(connection), new ReizigerDAOPsql(connection));
         closeConnection();
 
 
@@ -103,13 +103,7 @@ public class Main {
             System.out.println("oeps er ging iets mis ");
         }
 
-        // Extra reiziger toevoegen om een new adess in de data base te stoppen.
-        try {
-            rdao.save(new Reiziger(69,"J.A.J.","", "Bosman",java.sql.Date.valueOf("1998-09-01")));
-        }
-        catch (Exception e){
 
-        }
 
 
 
@@ -117,15 +111,11 @@ public class Main {
 
     }
     //Crud testen voor de class adres
-    private static void testAdress(AdresDAO adao) throws SQLException {
+    private static void testCrudAdress(AdresDAO adao, ReizigerDAO rdao) throws SQLException {
         System.out.println("\n---------- Test AdresDAO -------------");
 
-        // Haal alle adressen op uit de database
-        List<Adres> adres = adao.findAll();
-        System.out.println("[Test findall()] ReizigerDAO.findAll() geeft de volgende reizigers:");
-        for (Adres r : adres) {
-            System.out.println(r);
-        }
+
+
         System.out.println();
         // adress vinde doormiddel van adres id
         System.out.println("\n[Test find by id]");
@@ -136,40 +126,48 @@ public class Main {
         }
 
         // Maak een nieuw adres aan en persisteer deze in de database
-        String gbdatum = "1981-03-14";
 
-        Adres saveAdres = new Adres(69, "2312xx", "187A", "oude vest", "Leiden", 69);
-        System.out.print("[Test Save()]\n");
+        String gbdatum = "1981-03-14";
+        Adres saveAdres = new Adres(101, "2312xx", "187A", "oude vest", "Leiden", 69);
+        Reiziger tmpReiziger111=new Reiziger(69, "m", "", "Boers", java.sql.Date.valueOf(gbdatum));
+        rdao.save(tmpReiziger111);
+        System.out.print("\n[Test Save()]\n");
         adao.save(saveAdres);
-        adres = adao.findAll();
-        System.out.println( adao.findById(69).toString() +"\n");
+        System.out.println( " het volgende adres is corect opgeslagen:" + adao.findById(101).toString() +"\n");
 
         // adress updaten
-        System.out.print("[Test Updaten()]\n");
-        Adres updateAdress= new Adres(69, "6537JH", "5449", "Meijhorst ", "Nijmegen", 69);
-         if (adao.update(updateAdress)){
-             System.out.println(adao.findById(69) + "\n");
+        System.out.print("[Test Updaten()] van " + adao.findById(101) +"\n" );
+        Adres updateAdres101=new Adres(101, "6537JH", "5449", "Meijhorst ", "Nijmegen", 69);
+         if (adao.update(updateAdres101)){
+             System.out.println("updated adress:"+ rdao.findById(69) + "\n");
          }
          else {
              System.out.println("oeps de test ging niet goed");
          }
 
         System.out.print("[Test delete]\n");
-        if (adao.delete(updateAdress)) {
-         System.out.println("Het verwijderen  van adress_id= 69 is voltooid! \n");
+        if (adao.delete(updateAdres101)) {
+            System.out.println("Het verwijderen  van adress_id= 101 is voltooid! en de reizger met id= 69 \n");
         } else {
             System.out.println("Oeps er ging iets mis \n");
         }
+
+
+
         System.out.print("[Test findByReiziger]\n");
-        Reiziger tmpReiziger= new Reiziger(69,"J.A.J.","", "Bosman",java.sql.Date.valueOf("1998-09-01"));
-        adao.save(new Adres(101, "1234", "1", "kaas", "delft", tmpReiziger.getId() ));
-
-        System.out.println(adao.findByReiziger(tmpReiziger));
+        System.out.println(adao.findByReiziger(new Reiziger(5,"","", "",java.sql.Date.valueOf("1998-09-01"))));
 
 
 
 
 
+
+
+
+
+    }
+
+    private  static  void dataCorrectBinnenHalen(ReizigerDAOPsql rdao,  AdressDAOPsql adao){
 
 
     }

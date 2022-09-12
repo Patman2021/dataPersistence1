@@ -1,5 +1,8 @@
 package domein.reiziger;
 
+import domein.adres.Adres;
+import domein.adres.AdressDAOPsql;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +10,8 @@ import java.util.List;
 public class ReizigerDAOPsql implements ReizigerDAO {
 
     private  Connection conn;
+
+
 
     public  ReizigerDAOPsql(Connection conn){
         this.conn= conn;
@@ -28,7 +33,6 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
 
         } catch (Exception e) {
-            System.out.println(e);
             return false;
         }
     }
@@ -46,6 +50,8 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             ps.setInt(5,reiziger.getId());
             ps.executeUpdate();
             ps.close();
+            reiziger.adresToevoegenAanReiziger(adressDAOPsqlMaken().findByReiziger(reiziger));
+
             return true;
 
 
@@ -58,11 +64,17 @@ public class ReizigerDAOPsql implements ReizigerDAO {
     @Override
     public boolean delete(Reiziger reiziger) {
         try {
+            AdressDAOPsql adresMethodes=new AdressDAOPsql(conn);
+            Adres adres =adresMethodes.findByReiziger(reiziger);
+            if (reiziger.getAdres()!= null){
+                adresMethodes.delete(adres);
+            }
             String tmpUpdate= "DELETE FROM reiziger WHERE reiziger_id=?;";
             PreparedStatement ps= preparedStatementAanmaken(tmpUpdate);
             ps.setInt(1, reiziger.getId());
              ps.executeUpdate();
             ps.close();
+
             return true;
 
         }catch (Exception e){
@@ -78,10 +90,14 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             rs.next();
-            Reiziger s = nieuweReizigerAanmaken(rs);
+            Reiziger tmpReiziger = nieuweReizigerAanmaken(rs);
+            Adres adresOpZoeken=adressDAOPsqlMaken().findByReiziger(tmpReiziger);
+            if ( adresOpZoeken!= null){
+                tmpReiziger.adresToevoegenAanReiziger(adresOpZoeken);
+            }
             ps.close();
             rs.close();
-            return s;
+            return tmpReiziger;
 
         }
         catch (Exception e){
@@ -98,7 +114,16 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             ps.setString(1, datum);
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
-                lijstReizigers.add(nieuweReizigerAanmaken(rs));
+                Reiziger tmpReiziger= nieuweReizigerAanmaken(rs);
+                AdressDAOPsql adresMethodes=new AdressDAOPsql(conn);
+                Adres adres =adresMethodes.findByReiziger(tmpReiziger);
+                tmpReiziger.adresToevoegenAanReiziger(adres);
+                lijstReizigers.add(tmpReiziger);
+                Adres adresOpZoeken=adressDAOPsqlMaken().findByReiziger(tmpReiziger);
+                if ( adresOpZoeken!= null){
+                    tmpReiziger.adresToevoegenAanReiziger(adresOpZoeken);
+                }
+
             }
             ps.close();
             rs.close();
@@ -117,7 +142,16 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         String tmpSelectAll = "select  * from  reiziger;";
         ResultSet myre = preparedStatementAanmaken(tmpSelectAll).executeQuery();
         while (myre.next()){
-            lijstReizigers.add(nieuweReizigerAanmaken(myre));
+            Reiziger tmpReiziger= nieuweReizigerAanmaken(myre);
+            AdressDAOPsql adresMethodes=new AdressDAOPsql(conn);
+            Adres adres =adresMethodes.findByReiziger(tmpReiziger);
+            tmpReiziger.adresToevoegenAanReiziger(adres);
+            lijstReizigers.add(tmpReiziger);
+             Adres adresOpZoeken=adressDAOPsqlMaken().findByReiziger(tmpReiziger);
+            if ( adresOpZoeken!= null){
+                tmpReiziger.adresToevoegenAanReiziger(adresOpZoeken);
+            }
+
         }
         myre.close();
         return lijstReizigers;
@@ -131,5 +165,9 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
     public PreparedStatement preparedStatementAanmaken(String q) throws SQLException {
         return conn.prepareStatement(q);
+    }
+
+    public  AdressDAOPsql adressDAOPsqlMaken(){
+        return  new AdressDAOPsql(conn);
     }
 }

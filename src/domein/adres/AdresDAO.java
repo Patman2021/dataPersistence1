@@ -17,6 +17,5 @@ public interface AdresDAO {
 
 
 
-    List<Adres> findAll() throws SQLException;
 
 }

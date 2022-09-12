@@ -1,6 +1,7 @@
 package domein.adres;
 
 import domein.reiziger.Reiziger;
+import domein.reiziger.ReizigerDAOPsql;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,6 +10,8 @@ import java.util.List;
 public class AdressDAOPsql implements AdresDAO {
 
     private Connection conn;
+
+    private  Reiziger reiziger;
 
     public AdressDAOPsql(Connection conn) {
         this.conn = conn;
@@ -31,7 +34,6 @@ public class AdressDAOPsql implements AdresDAO {
 
 
         }catch (Exception e){
-            System.out.println(e);
             return null;
         }
     }
@@ -52,6 +54,7 @@ public class AdressDAOPsql implements AdresDAO {
             ps.setInt(6, adres.getReizigerId());
             ps.executeUpdate();
             ps.close();
+            reizigerDAOPsqlMaken().findById(adres.getReizigerId()).adresToevoegenAanReiziger(adres);
             return true;
 
 
@@ -74,11 +77,11 @@ public class AdressDAOPsql implements AdresDAO {
             ps.setInt(5, adres.getId());
             ps.executeUpdate();
             ps.close();
+            reizigerDAOPsqlMaken().findById(adres.getReizigerId()).adresToevoegenAanReiziger(adres);
             return true;
 
 
         } catch (Exception e) {
-            System.out.println(e);
             return false;
         }
     }
@@ -91,6 +94,7 @@ public class AdressDAOPsql implements AdresDAO {
             ps.setInt(1, adres.getId());
             ps.executeUpdate();
             ps.close();
+            reizigerDAOPsqlMaken().delete(reizigerDAOPsqlMaken().findById(adres.getReizigerId()));
             return true;
 
         }catch (Exception e){
@@ -112,21 +116,11 @@ public class AdressDAOPsql implements AdresDAO {
             return a;
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            ;
             return null;
         }
     }
-    @Override
-    public List<Adres> findAll() throws SQLException {
-        List lijstReizigers= new ArrayList<Reiziger>();
-        String tmpSelectAll = "select  * from  adres;";
-        ResultSet myre = preparedStatementAanmaken(tmpSelectAll).executeQuery();
-        while (myre.next()){
-            lijstReizigers.add(nieuwAdresAanmaken(myre));
-        }
-        myre.close();
-        return lijstReizigers;
-    }
+
 
     public Adres nieuwAdresAanmaken(ResultSet rset) throws SQLException {
         return new Adres(rset.getInt("adres_id"), rset.getString("postcode"),
@@ -138,6 +132,10 @@ public class AdressDAOPsql implements AdresDAO {
 
     public PreparedStatement preparedStatementAanmaken(String q) throws SQLException {
         return conn.prepareStatement(q);
+    }
+
+    public  ReizigerDAOPsql reizigerDAOPsqlMaken(){
+        return new ReizigerDAOPsql(this.conn);
     }
 }
 
