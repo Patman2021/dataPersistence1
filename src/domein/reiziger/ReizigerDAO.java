@@ -3,6 +3,8 @@ package domein.reiziger;
 import java.sql.SQLException;
 import java.util.List;
 
+
+
 public interface ReizigerDAO {
 
     boolean save(Reiziger reiziger) throws SQLException;
@@ -16,5 +18,4 @@ public interface ReizigerDAO {
     List<Reiziger> findByGbdatum(String datum);
 
     List<Reiziger> findAll() throws SQLException;
-
 }

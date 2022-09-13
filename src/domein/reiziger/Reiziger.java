@@ -1,7 +1,5 @@
 package domein.reiziger;
 
-import domein.adres.Adres;
-
 import java.util.Date;
 
 public class Reiziger {
@@ -10,8 +8,6 @@ public class Reiziger {
     private  String tussenvoegsel;
     private String achternaam;
     private Date geboortedatum;
-
-    private Adres adres;
 
     public  Reiziger( int id, String voorletters, String tussenvoegsel, String achternaam, Date geboortedatum){
         this.id= id;
@@ -25,6 +21,9 @@ public class Reiziger {
         return  this.id;
     }
 
+    public  void setId(int id){
+        this.id = id;
+    }
 
     public String getNaam(){
         return  this.voorletters + " " + this.tussenvoegsel + " " + this.achternaam;

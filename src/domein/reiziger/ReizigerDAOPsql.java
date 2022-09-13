@@ -1,4 +1,7 @@
-package domein.reiziger;
+package reiziger;
+
+import domein.reiziger.Reiziger;
+import domein.reiziger.ReizigerDAO;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -61,7 +64,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             String tmpUpdate= "DELETE FROM reiziger WHERE reiziger_id=?;";
             PreparedStatement ps= preparedStatementAanmaken(tmpUpdate);
             ps.setInt(1, reiziger.getId());
-             ps.executeUpdate();
+            ps.executeUpdate();
             ps.close();
             return true;
 
@@ -86,7 +89,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         }
         catch (Exception e){
             System.out.println(e.getMessage());
-         return null;}
+            return null;}
     }
 
     @Override
