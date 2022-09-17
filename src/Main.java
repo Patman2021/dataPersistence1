@@ -15,27 +15,27 @@ public class Main {
 
 
     public static   void main(String [] args) throws SQLException {
-        getconnection();
-        testReizigerDAO(new ReizigerDAOPsql(connection));
-        testCrudAdress(new AdressDAOPsql(connection), new ReizigerDAOPsql(connection));
+         ReizigerDAOPsql rdao = new ReizigerDAOPsql(getconnection());
+         AdressDAOPsql adao= new AdressDAOPsql(getconnection());
+         rdao.setAdresDAO(adao);
+         adao.setReizigerDAO(rdao);
+        testReizigerDAO( rdao);
+        testCrudAdress(adao, rdao);
         closeConnection();
 
 
     }
 
-    public static void getconnection(){
-        try {
-            // connecten met database in postgres
-            Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost/ovchip", "student", "student");
-            connection = myConn;
+    public  static Connection getconnection() throws SQLException {
+        if (connection == null){
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost/ovchip", "student", "student");
         }
-        catch (Exception exc){
-            exc.printStackTrace();
-        }
+        return connection;
     }
 
     public  static  void closeConnection() throws SQLException {
         connection.close();
+        connection= null;
 
     }
 
@@ -114,13 +114,10 @@ public class Main {
     private static void testCrudAdress(AdresDAO adao, ReizigerDAO rdao) throws SQLException {
         System.out.println("\n---------- Test AdresDAO -------------");
 
-
-
-        System.out.println();
         // adress vinde doormiddel van adres id
         System.out.println("\n[Test find by id]");
         if ( null != adao.findById(5)){
-            System.out.println( adao.findById(5).toString());
+            System.out.println( adao.findById(5));
         }else {
             System.out.println("Oeps er ging iets fout\n");
         }
@@ -167,9 +164,5 @@ public class Main {
 
     }
 
-    private  static  void dataCorrectBinnenHalen(ReizigerDAOPsql rdao,  AdressDAOPsql adao){
-
-
-    }
 
 }

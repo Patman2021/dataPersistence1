@@ -1,6 +1,7 @@
 package domein.adres;
 
 import domein.reiziger.Reiziger;
+import domein.reiziger.ReizigerDAO;
 import domein.reiziger.ReizigerDAOPsql;
 
 import java.sql.*;
@@ -12,6 +13,7 @@ public class AdressDAOPsql implements AdresDAO {
     private Connection conn;
 
     private  Reiziger reiziger;
+    private ReizigerDAO reizigerDAO;
 
     public AdressDAOPsql(Connection conn) {
         this.conn = conn;
@@ -54,7 +56,6 @@ public class AdressDAOPsql implements AdresDAO {
             ps.setInt(6, adres.getReizigerId());
             ps.executeUpdate();
             ps.close();
-            reizigerDAOPsqlMaken().findById(adres.getReizigerId()).adresToevoegenAanReiziger(adres);
             return true;
 
 
@@ -77,7 +78,7 @@ public class AdressDAOPsql implements AdresDAO {
             ps.setInt(5, adres.getId());
             ps.executeUpdate();
             ps.close();
-            reizigerDAOPsqlMaken().findById(adres.getReizigerId()).adresToevoegenAanReiziger(adres);
+            reizigerDAO.findById(adres.getReizigerId()).adresToevoegenAanReiziger(adres);
             return true;
 
 
@@ -94,7 +95,7 @@ public class AdressDAOPsql implements AdresDAO {
             ps.setInt(1, adres.getId());
             ps.executeUpdate();
             ps.close();
-            reizigerDAOPsqlMaken().delete(reizigerDAOPsqlMaken().findById(adres.getReizigerId()));
+            reizigerDAO.delete(reizigerDAO.findById(adres.getReizigerId()));
             return true;
 
         }catch (Exception e){
@@ -134,8 +135,8 @@ public class AdressDAOPsql implements AdresDAO {
         return conn.prepareStatement(q);
     }
 
-    public  ReizigerDAOPsql reizigerDAOPsqlMaken(){
-        return new ReizigerDAOPsql(this.conn);
+    public void setReizigerDAO(ReizigerDAO reizigerDAO) {
+        this.reizigerDAO = reizigerDAO;
     }
 }
 

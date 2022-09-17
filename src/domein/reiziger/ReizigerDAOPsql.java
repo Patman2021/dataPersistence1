@@ -1,7 +1,9 @@
 package domein.reiziger;
 
+
+
 import domein.adres.Adres;
-import domein.adres.AdressDAOPsql;
+import domein.adres.AdresDAO;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.List;
 public class ReizigerDAOPsql implements ReizigerDAO {
 
     private  Connection conn;
+    private AdresDAO adresDAO;
 
 
 
@@ -20,7 +23,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
     @Override
     public boolean save(Reiziger reiziger) {
         try {
-            String tmpSave= "insert into reiziger   values (?, ?, ?, ?,?);";
+            String tmpSave= "insert into reiziger (reiziger_id, voorletters, tussenvoegsel, achternaam, geboortedatum)  values (?,?,?,?,?)   ;";
             PreparedStatement ps =preparedStatementAanmaken(tmpSave);
             ps.setInt(1,reiziger.getId());
             ps.setString(2, reiziger.getVoorletters());
@@ -29,6 +32,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             ps.setDate(5, (Date) reiziger.getGeboortedatum());
             ps.executeUpdate();
             ps.close();
+            adresDAO.save(reiziger.getAdres());
             return true;
 
 
@@ -50,7 +54,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             ps.setInt(5,reiziger.getId());
             ps.executeUpdate();
             ps.close();
-            reiziger.adresToevoegenAanReiziger(adressDAOPsqlMaken().findByReiziger(reiziger));
+            reiziger.adresToevoegenAanReiziger(adresDAO.findByReiziger(reiziger));
 
             return true;
 
@@ -64,10 +68,9 @@ public class ReizigerDAOPsql implements ReizigerDAO {
     @Override
     public boolean delete(Reiziger reiziger) {
         try {
-            AdressDAOPsql adresMethodes=new AdressDAOPsql(conn);
-            Adres adres =adresMethodes.findByReiziger(reiziger);
+            Adres adres =  adresDAO.findByReiziger(reiziger);
             if (reiziger.getAdres()!= null){
-                adresMethodes.delete(adres);
+                adresDAO.delete(adres);
             }
             String tmpUpdate= "DELETE FROM reiziger WHERE reiziger_id=?;";
             PreparedStatement ps= preparedStatementAanmaken(tmpUpdate);
@@ -91,7 +94,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             ResultSet rs = ps.executeQuery();
             rs.next();
             Reiziger tmpReiziger = nieuweReizigerAanmaken(rs);
-            Adres adresOpZoeken=adressDAOPsqlMaken().findByReiziger(tmpReiziger);
+            Adres adresOpZoeken=adresDAO.findByReiziger(tmpReiziger);
             if ( adresOpZoeken!= null){
                 tmpReiziger.adresToevoegenAanReiziger(adresOpZoeken);
             }
@@ -115,11 +118,10 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
                 Reiziger tmpReiziger= nieuweReizigerAanmaken(rs);
-                AdressDAOPsql adresMethodes=new AdressDAOPsql(conn);
-                Adres adres =adresMethodes.findByReiziger(tmpReiziger);
+                Adres adres =adresDAO.findByReiziger(tmpReiziger);
                 tmpReiziger.adresToevoegenAanReiziger(adres);
                 lijstReizigers.add(tmpReiziger);
-                Adres adresOpZoeken=adressDAOPsqlMaken().findByReiziger(tmpReiziger);
+                Adres adresOpZoeken=adresDAO.findByReiziger(tmpReiziger);
                 if ( adresOpZoeken!= null){
                     tmpReiziger.adresToevoegenAanReiziger(adresOpZoeken);
                 }
@@ -143,11 +145,10 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         ResultSet myre = preparedStatementAanmaken(tmpSelectAll).executeQuery();
         while (myre.next()){
             Reiziger tmpReiziger= nieuweReizigerAanmaken(myre);
-            AdressDAOPsql adresMethodes=new AdressDAOPsql(conn);
-            Adres adres =adresMethodes.findByReiziger(tmpReiziger);
+            Adres adres =adresDAO.findByReiziger(tmpReiziger);
             tmpReiziger.adresToevoegenAanReiziger(adres);
             lijstReizigers.add(tmpReiziger);
-             Adres adresOpZoeken=adressDAOPsqlMaken().findByReiziger(tmpReiziger);
+             Adres adresOpZoeken=adresDAO.findByReiziger(tmpReiziger);
             if ( adresOpZoeken!= null){
                 tmpReiziger.adresToevoegenAanReiziger(adresOpZoeken);
             }
@@ -167,7 +168,8 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         return conn.prepareStatement(q);
     }
 
-    public  AdressDAOPsql adressDAOPsqlMaken(){
-        return  new AdressDAOPsql(conn);
+
+    public void setAdresDAO(AdresDAO adresDAO) {
+        this.adresDAO = adresDAO;
     }
 }
