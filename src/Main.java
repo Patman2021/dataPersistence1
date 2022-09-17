@@ -3,24 +3,17 @@ import java.sql.*;
 public class Main {
     public  static   Connection connection;
 
-
-    public static Statement getconnection(){
-        try {
-            // connecten met database in postgres
-            Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost/ovchip", "student", "student");
-            connection = myConn;
-            // statement maken
-            Statement statement = myConn.createStatement();
-            return statement;
+    public  static Connection getconnection() throws SQLException {
+        if (connection == null){
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost/ovchip", "student", "student");
         }
-        catch (Exception exc){
-            exc.printStackTrace();
-        }
-        return null;
+        return connection;
     }
 
+
+
     public   static void  alleReizigersUitprinten() throws SQLException {
-        Statement statement =getconnection();
+        Statement statement =getconnection().createStatement();
         ResultSet myre = statement.executeQuery("select  * from  reiziger");
         System.out.println("Alle reizigers:");
         while (myre.next()){
@@ -40,8 +33,11 @@ public class Main {
 
     }
 
+
+
     public  static  void closeConnection() throws SQLException {
         connection.close();
+        connection= null;
 
     }
 
