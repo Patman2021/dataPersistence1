@@ -1,7 +1,9 @@
 package domein.reiziger;
 
 import domein.adres.Adres;
+import domein.ovChip.OvChipkaart;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Reiziger {
@@ -12,6 +14,8 @@ public class Reiziger {
     private Date geboortedatum;
 
     private Adres adres;
+
+    private ArrayList<OvChipkaart> ovChipkaart = new ArrayList<>();
 
     public  Reiziger( int id, String voorletters, String tussenvoegsel, String achternaam, Date geboortedatum){
         this.id= id;
@@ -50,16 +54,26 @@ public class Reiziger {
         this.adres= adres;
     }
 
+    public ArrayList<OvChipkaart> getOvChipkaart() {
+        return ovChipkaart;
+    }
+
+    public void addOvChipKaart(OvChipkaart ovChipkaart) {
+        this.ovChipkaart.add(ovChipkaart);
+    }
+
+    public void removeOvChipKaart(OvChipkaart ov){
+            ovChipkaart.remove(ov);
+    }
+
     public Adres getAdres() {
         return adres;
     }
 
-    public void adresVerwijderen(){
-        this.adres = null;
-    }
+
 
     @Override
     public String toString() {
-        return   "reiziger {"+this.id +": "+ getNaam() +". Geboren op:"+ geboortedatum +" "+ adres +"}";
+        return   "reiziger {"+this.id +": "+ getNaam() +". Geboren op:"+ geboortedatum +" "+ adres +"}  Ov_chipkaart" + ovChipkaart;
     }
 }

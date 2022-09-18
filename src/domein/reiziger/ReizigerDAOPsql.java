@@ -4,6 +4,8 @@ package domein.reiziger;
 
 import domein.adres.Adres;
 import domein.adres.AdresDAO;
+import domein.ovChip.OvChipDao;
+import domein.ovChip.OvChipkaart;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
     private  Connection conn;
     private AdresDAO adresDAO;
+    private OvChipDao ovChipDao;
 
 
 
@@ -21,8 +24,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
     }
 
     @Override
-    public boolean save(Reiziger reiziger) {
-        try {
+    public boolean save(Reiziger reiziger) throws SQLException {
             String tmpSave= "insert into reiziger (reiziger_id, voorletters, tussenvoegsel, achternaam, geboortedatum)  values (?,?,?,?,?)   ;";
             PreparedStatement ps =preparedStatementAanmaken(tmpSave);
             ps.setInt(1,reiziger.getId());
@@ -33,36 +35,40 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             ps.executeUpdate();
             ps.close();
             adresDAO.save(reiziger.getAdres());
+            if (reiziger.getOvChipkaart() != null ){
+                for( OvChipkaart ov : reiziger.getOvChipkaart() ){
+            ovChipDao.save(ov);}
             return true;
 
 
-        } catch (Exception e) {
-            return false;
         }
-    }
+     return  false;}
 
     @Override
-    public boolean update(Reiziger reiziger){
+    public boolean update(Reiziger reiziger) throws SQLException {
         try {
-            String tmpUpdate= "update  reiziger SET voorletters=?, tussenvoegsel=? , achternaam=? , geboortedatum=?" +
-                    "where reiziger.reiziger_id=?;";
-            PreparedStatement ps =preparedStatementAanmaken(tmpUpdate);
-            ps.setString(1, reiziger.getVoorletters());
-            ps.setString(2, reiziger.getTussenvoegsel());
-            ps.setString(3, reiziger.getAchternaam());
-            ps.setDate(4, (Date) reiziger.getGeboortedatum());
-            ps.setInt(5,reiziger.getId());
-            ps.executeUpdate();
-            ps.close();
-            reiziger.adresToevoegenAanReiziger(adresDAO.findByReiziger(reiziger));
-
-            return true;
 
 
-        } catch (Exception e) {
+        String tmpUpdate = "update  reiziger SET voorletters=?, tussenvoegsel=? , achternaam=? , geboortedatum=?" +
+                "where reiziger.reiziger_id=?;";
+        PreparedStatement ps = preparedStatementAanmaken(tmpUpdate);
+        ps.setString(1, reiziger.getVoorletters());
+        ps.setString(2, reiziger.getTussenvoegsel());
+        ps.setString(3, reiziger.getAchternaam());
+        ps.setDate(4, (Date) reiziger.getGeboortedatum());
+        ps.setInt(5, reiziger.getId());
+        ps.executeUpdate();
+        ps.close();
+        reiziger.adresToevoegenAanReiziger(adresDAO.findByReiziger(reiziger));
+        if (reiziger.getOvChipkaart() != null) {
+            for (OvChipkaart ov : reiziger.getOvChipkaart()) {
+                ovChipDao.update(ov);
+            }
+            return true;}
+        }catch (Exception e){
             System.out.println(e);
-            return false;
         }
+        return false;
     }
 
     @Override
@@ -77,6 +83,11 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             ps.setInt(1, reiziger.getId());
              ps.executeUpdate();
             ps.close();
+            if (reiziger.getOvChipkaart() != null){
+                for (OvChipkaart ov : reiziger.getOvChipkaart()){
+                    ovChipDao.delete(ov);
+                }
+            }
 
             return true;
 
@@ -97,6 +108,11 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             Adres adresOpZoeken=adresDAO.findByReiziger(tmpReiziger);
             if ( adresOpZoeken!= null){
                 tmpReiziger.adresToevoegenAanReiziger(adresOpZoeken);
+            }
+            ArrayList<OvChipkaart> ovKaartenOpzoeken = ovChipDao.findByReiziger(tmpReiziger);
+            if (ovKaartenOpzoeken != null){
+                for (OvChipkaart ov : ovKaartenOpzoeken){
+                    tmpReiziger.addOvChipKaart(ov);}
             }
             ps.close();
             rs.close();
@@ -125,6 +141,11 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 if ( adresOpZoeken!= null){
                     tmpReiziger.adresToevoegenAanReiziger(adresOpZoeken);
                 }
+                ArrayList<OvChipkaart> ovKaartenOpzoeken = ovChipDao.findByReiziger(tmpReiziger);
+                if (ovKaartenOpzoeken != null){
+                    for (OvChipkaart ov : ovKaartenOpzoeken){
+                        tmpReiziger.addOvChipKaart(ov);}
+                }
 
             }
             ps.close();
@@ -152,6 +173,11 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             if ( adresOpZoeken!= null){
                 tmpReiziger.adresToevoegenAanReiziger(adresOpZoeken);
             }
+            ArrayList<OvChipkaart> ovKaartenOpzoeken = ovChipDao.findByReiziger(tmpReiziger);
+            if (ovKaartenOpzoeken != null){
+                for (OvChipkaart ov : ovKaartenOpzoeken){
+                tmpReiziger.addOvChipKaart(ov);}
+            }
 
         }
         myre.close();
@@ -171,5 +197,9 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
     public void setAdresDAO(AdresDAO adresDAO) {
         this.adresDAO = adresDAO;
+    }
+
+    public void setOvChipDao(OvChipDao ovChipDao) {
+        this.ovChipDao = ovChipDao;
     }
 }

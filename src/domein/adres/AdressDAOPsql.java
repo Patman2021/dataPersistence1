@@ -95,7 +95,6 @@ public class AdressDAOPsql implements AdresDAO {
             ps.setInt(1, adres.getId());
             ps.executeUpdate();
             ps.close();
-            reizigerDAO.delete(reizigerDAO.findById(adres.getReizigerId()));
             return true;
 
         }catch (Exception e){

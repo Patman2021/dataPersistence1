@@ -1,6 +1,9 @@
 import domein.adres.Adres;
 import domein.adres.AdresDAO;
 import domein.adres.AdressDAOPsql;
+import domein.ovChip.OvChipDAOsql;
+import domein.ovChip.OvChipDao;
+import domein.ovChip.OvChipkaart;
 import domein.reiziger.Reiziger;
 import domein.reiziger.ReizigerDAO;
 import domein.reiziger.ReizigerDAOPsql;
@@ -17,10 +20,13 @@ public class Main {
     public static   void main(String [] args) throws SQLException {
          ReizigerDAOPsql rdao = new ReizigerDAOPsql(getconnection());
          AdressDAOPsql adao= new AdressDAOPsql(getconnection());
+         OvChipDAOsql ovdao= new OvChipDAOsql(getconnection());
          rdao.setAdresDAO(adao);
          adao.setReizigerDAO(rdao);
+         rdao.setOvChipDao(ovdao);
         testReizigerDAO( rdao);
         testCrudAdress(adao, rdao);
+        testCrudOvChipKaart(ovdao, rdao);
         closeConnection();
 
 
@@ -145,6 +151,7 @@ public class Main {
         System.out.print("[Test delete]\n");
         if (adao.delete(updateAdres101)) {
             System.out.println("Het verwijderen  van adress_id= 101 is voltooid! en de reizger met id= 69 \n");
+            rdao.delete(tmpReiziger111);
         } else {
             System.out.println("Oeps er ging iets mis \n");
         }
@@ -153,6 +160,62 @@ public class Main {
 
         System.out.print("[Test findByReiziger]\n");
         System.out.println(adao.findByReiziger(new Reiziger(5,"","", "",java.sql.Date.valueOf("1998-09-01"))));
+
+
+
+
+
+
+
+
+
+    }
+
+    private static void testCrudOvChipKaart(OvChipDao ovChipDao, ReizigerDAO rdao) throws SQLException {
+        System.out.println("\n---------- Test OV-ChipkaarDAO -------------");
+
+
+        // Maak een nieuw ov chipkaart aan aan en persisteer deze in de database
+
+        String gbdatum = "1981-03-14";
+        Reiziger tmpReiziger111=new Reiziger(100, "N", "", "Vermeulen", java.sql.Date.valueOf(gbdatum));
+        rdao.save(tmpReiziger111);
+        System.out.print("\n[Test Save()]\n");
+        ovChipDao.save(new OvChipkaart(12344 , java.sql.Date.valueOf("2025-09-01"), 1 , 100, 100 ));
+        System.out.println( " De volgende ov-kaart is corect opgeslagen:" + ovChipDao.findByKaart_Nummer(12344).toString() +"\n");
+
+        // ov-kaart vinden doormiddel van kaartnummer
+        System.out.println("\n[Test find by id]");
+        if ( null != ovChipDao.findByKaart_Nummer(12344)){
+            System.out.println(ovChipDao.findByKaart_Nummer(12344) );
+        }else {
+            System.out.println("Oeps er ging iets fout\n");
+        }
+
+        // ov-kaart updaten
+        System.out.print("\n[Test Updaten()] van " + ovChipDao.findByKaart_Nummer(12344) +"\n" );
+        OvChipkaart updateOvChipkaart=new OvChipkaart(12344,  java.sql.Date.valueOf("2025-09-01"), 1, 50, 100);
+        if (ovChipDao.update(updateOvChipkaart)){
+            System.out.println("updated ov-Chipkaart:"+ ovChipDao.findByKaart_Nummer(12344)+ "\n");
+        }
+        else {
+            System.out.println("oeps de test ging niet goed");
+        }
+
+
+
+
+        System.out.print("[Test findByReiziger]\n");
+        System.out.println(ovChipDao.findByReiziger(tmpReiziger111));
+
+        System.out.print("\n[Test delete]\n");
+        if (ovChipDao.delete(updateOvChipkaart)) {
+            // puur voor deze test wordt er ook een extra aangemaakte reiziger verwijderd
+            rdao.delete(tmpReiziger111);
+            System.out.println("Het verwijderen de ov-chipkaart is voltooid!\n");
+        } else {
+            System.out.println("Oeps er ging iets mis \n");
+        }
 
 
 
