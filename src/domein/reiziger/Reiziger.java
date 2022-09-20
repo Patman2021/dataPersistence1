@@ -50,7 +50,7 @@ public class Reiziger {
         return voorletters;
     }
 
-    public void adresToevoegenAanReiziger(Adres adres){
+    public void setAdres(Adres adres){
         this.adres= adres;
     }
 

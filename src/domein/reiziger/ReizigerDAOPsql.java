@@ -47,8 +47,6 @@ public class ReizigerDAOPsql implements ReizigerDAO {
     @Override
     public boolean update(Reiziger reiziger) throws SQLException {
         try {
-
-
         String tmpUpdate = "update  reiziger SET voorletters=?, tussenvoegsel=? , achternaam=? , geboortedatum=?" +
                 "where reiziger.reiziger_id=?;";
         PreparedStatement ps = preparedStatementAanmaken(tmpUpdate);
@@ -59,7 +57,9 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         ps.setInt(5, reiziger.getId());
         ps.executeUpdate();
         ps.close();
-        reiziger.adresToevoegenAanReiziger(adresDAO.findByReiziger(reiziger));
+        if (reiziger.getAdres() != null){
+            adresDAO.update(reiziger.getAdres());
+        }
         if (reiziger.getOvChipkaart() != null) {
             for (OvChipkaart ov : reiziger.getOvChipkaart()) {
                 ovChipDao.update(ov);
@@ -74,15 +74,14 @@ public class ReizigerDAOPsql implements ReizigerDAO {
     @Override
     public boolean delete(Reiziger reiziger) {
         try {
-            Adres adres =  adresDAO.findByReiziger(reiziger);
-            if (reiziger.getAdres()!= null){
-                adresDAO.delete(adres);
-            }
             String tmpUpdate= "DELETE FROM reiziger WHERE reiziger_id=?;";
             PreparedStatement ps= preparedStatementAanmaken(tmpUpdate);
             ps.setInt(1, reiziger.getId());
              ps.executeUpdate();
             ps.close();
+            Adres adres =  adresDAO.findByReiziger(reiziger);
+            if (reiziger.getAdres()!= null){
+                adresDAO.delete(adres);}
             if (reiziger.getOvChipkaart() != null){
                 for (OvChipkaart ov : reiziger.getOvChipkaart()){
                     ovChipDao.delete(ov);
@@ -107,7 +106,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             Reiziger tmpReiziger = nieuweReizigerAanmaken(rs);
             Adres adresOpZoeken=adresDAO.findByReiziger(tmpReiziger);
             if ( adresOpZoeken!= null){
-                tmpReiziger.adresToevoegenAanReiziger(adresOpZoeken);
+                tmpReiziger.setAdres(adresOpZoeken);
             }
             ArrayList<OvChipkaart> ovKaartenOpzoeken = ovChipDao.findByReiziger(tmpReiziger);
             if (ovKaartenOpzoeken != null){
@@ -135,11 +134,11 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             while (rs.next()){
                 Reiziger tmpReiziger= nieuweReizigerAanmaken(rs);
                 Adres adres =adresDAO.findByReiziger(tmpReiziger);
-                tmpReiziger.adresToevoegenAanReiziger(adres);
+                tmpReiziger.setAdres(adres);
                 lijstReizigers.add(tmpReiziger);
                 Adres adresOpZoeken=adresDAO.findByReiziger(tmpReiziger);
                 if ( adresOpZoeken!= null){
-                    tmpReiziger.adresToevoegenAanReiziger(adresOpZoeken);
+                    tmpReiziger.setAdres(adresOpZoeken);
                 }
                 ArrayList<OvChipkaart> ovKaartenOpzoeken = ovChipDao.findByReiziger(tmpReiziger);
                 if (ovKaartenOpzoeken != null){
@@ -167,11 +166,11 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         while (myre.next()){
             Reiziger tmpReiziger= nieuweReizigerAanmaken(myre);
             Adres adres =adresDAO.findByReiziger(tmpReiziger);
-            tmpReiziger.adresToevoegenAanReiziger(adres);
+            tmpReiziger.setAdres(adres);
             lijstReizigers.add(tmpReiziger);
              Adres adresOpZoeken=adresDAO.findByReiziger(tmpReiziger);
             if ( adresOpZoeken!= null){
-                tmpReiziger.adresToevoegenAanReiziger(adresOpZoeken);
+                tmpReiziger.setAdres(adresOpZoeken);
             }
             ArrayList<OvChipkaart> ovKaartenOpzoeken = ovChipDao.findByReiziger(tmpReiziger);
             if (ovKaartenOpzoeken != null){
