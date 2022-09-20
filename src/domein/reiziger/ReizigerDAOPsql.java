@@ -36,8 +36,9 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             ps.close();
             adresDAO.save(reiziger.getAdres());
             if (reiziger.getOvChipkaart() != null ){
-                for( OvChipkaart ov : reiziger.getOvChipkaart() ){
-            ovChipDao.save(ov);}
+                for( OvChipkaart ov : reiziger.getOvChipkaart() ) {
+                    ovChipDao.save(ov);
+                }
             return true;
 
 
