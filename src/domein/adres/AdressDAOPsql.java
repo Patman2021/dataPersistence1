@@ -78,7 +78,7 @@ public class AdressDAOPsql implements AdresDAO {
             ps.setInt(5, adres.getId());
             ps.executeUpdate();
             ps.close();
-            reizigerDAO.findById(adres.getReizigerId()).adresToevoegenAanReiziger(adres);
+            reizigerDAO.findById(adres.getReizigerId()).setAdres(adres);
             return true;
 
 

@@ -76,4 +76,5 @@ public class Reiziger {
     public String toString() {
         return   "reiziger {"+this.id +": "+ getNaam() +". Geboren op:"+ geboortedatum +" "+ adres +"}  Ov_chipkaart" + ovChipkaart;
     }
+
 }

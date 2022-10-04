@@ -1,3 +1,6 @@
+import domein.Product.Product;
+import domein.Product.ProductDAOsql;
+import domein.Product.ProductDao;
 import domein.adres.Adres;
 import domein.adres.AdresDAO;
 import domein.adres.AdressDAOPsql;
@@ -8,25 +11,42 @@ import domein.reiziger.Reiziger;
 import domein.reiziger.ReizigerDAO;
 import domein.reiziger.ReizigerDAOPsql;
 
+import javax.swing.*;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
     private   static   Connection connection;
-    private  ReizigerDAO rdao;
-    private Reiziger reiziger;
+
 
 
     public static   void main(String [] args) throws SQLException {
          ReizigerDAOPsql rdao = new ReizigerDAOPsql(getconnection());
          AdressDAOPsql adao= new AdressDAOPsql(getconnection());
          OvChipDAOsql ovdao= new OvChipDAOsql(getconnection());
+         ProductDAOsql pdao= new ProductDAOsql(getconnection());
          rdao.setAdresDAO(adao);
          adao.setReizigerDAO(rdao);
          rdao.setOvChipDao(ovdao);
-        testReizigerDAO( rdao);
-        testCrudAdress(adao, rdao);
-        testCrudOvChipKaart(ovdao, rdao);
+         pdao.setOvChipDao(ovdao);
+         ovdao.setProductDao(pdao);
+        // Product test =new Product(3,"Dal Voordeel 40%",
+        //         "40% korting buiten de spits en in het weekeind.", 50.00F);
+        // ArrayList<OvChipkaart>  lijst =pdao.findLinksProduct(test);
+       // Reiziger tmpReiziger111=new Reiziger(100, "N", "", "Vermeulen", java.sql.Date.valueOf("1998-01-01"));
+       //   OvChipkaart ov =new OvChipkaart(123 , java.sql.Date.valueOf("2025-09-01"), 1 , 100, 100 );
+       //   ov.addProductToList(test);
+
+
+
+
+       // testReizigerDAO( rdao);
+       // testCrudAdress(adao, rdao);
+        //testCrudOvChipKaart(ovdao, rdao);
+        testProductOvChipkaartCrud(ovdao, pdao);
+
+
         closeConnection();
 
 
@@ -52,6 +72,8 @@ public class Main {
      *
      * @throws SQLException
      */
+
+
     private static void testReizigerDAO(ReizigerDAO rdao) throws SQLException {
         System.out.println("\n---------- Test ReizigerDAO -------------");
 
@@ -226,6 +248,66 @@ public class Main {
 
 
     }
+
+    private  static  void testProductOvChipkaartCrud(OvChipDao ovChipDao, ProductDao productDao) throws SQLException {
+        System.out.println("\n---------- Test ProductDAO -------------");
+        System.out.println("\n [Test] ProductDao.findAll() geeft de volgende producten en ovchipkaarten in de link:\n");
+        for (Product  p: productDao.findAll() ){
+            System.out.println(p + "\n");
+        }
+
+
+        // Maak een nieuw product aan aan en persisteer deze in de database
+        Product product= new Product(99,"test", "testen is leuk", 99.45F);
+        // Reiziger tmpReiziger111=new Reiziger(100, "N", "", "Vermeulen", java.sql.Date.valueOf("1998-01-09"));
+        OvChipkaart ov1=new OvChipkaart(12344 , java.sql.Date.valueOf("2025-09-01"), 1 , 100, 100 );
+        ov1.addProductToList(product);
+        ovChipDao.save(ov1);
+        System.out.print("\n[Test Save() product en ov-Chipkaart + de link er tussen ]\n");
+        System.out.println( " De volgende link is goed opgeslagen is corect opgeslagen: \n" + productDao.findByOvkaart(ov1) + "\n" );
+
+
+        System.out.print("\n[Test update() product en ov-Chipkaart + de link er tussen ]\n");
+        Product product2= new Product(999,"Fietsen", "Fietsen is leuk", 99.45F);
+        ov1.setKlasse(3);
+        ov1.addProductToList(product2);
+        ov1.deleteProductFromList(product);
+        product.setBeschrijving("testen is nog steeds leuk");
+        ov1.addProductToList(product);
+
+        if (ovChipDao.update(ov1)){
+            System.out.println("updated ov-Chipkaart and product :"+ productDao.findByOvkaart(ov1) + "\n");
+        }
+        else {
+            System.out.println("oeps de test ging niet goed");
+        }
+
+        System.out.print("[Test findByOvChipkaart]\n");
+        System.out.println(productDao.findByOvkaart(ov1));
+
+
+        System.out.print("\n[Test delete]\n");
+        if (ovChipDao.delete(ov1)) {
+            // puur voor deze test wordt er ook een extra aangemaakte reiziger verwijderd
+            System.out.println("Het verwijderen de  producten en ov-chipkaarten is voltooid!\n");
+        } else {
+            System.out.println("Oeps er ging iets mis \n");
+        }
+
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+
 
 
 }

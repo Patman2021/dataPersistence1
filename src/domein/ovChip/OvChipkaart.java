@@ -1,5 +1,8 @@
 package domein.ovChip;
 
+import domein.Product.Product;
+
+import java.util.ArrayList;
 import java.util.Date;
 
 public class OvChipkaart {
@@ -9,6 +12,10 @@ public class OvChipkaart {
     private float saldo;
     private  int reizigerId;
 
+    private  Product product;
+
+    private ArrayList<Product> productenLijst;
+
 
     public OvChipkaart( int kaartNummer, Date geligTot, int klasse, float saldo, int reizigerId){
         this.kaartNummer= kaartNummer;
@@ -16,6 +23,7 @@ public class OvChipkaart {
         this.klasse = klasse;
         this.saldo= saldo;
         this.reizigerId = reizigerId;
+        this.productenLijst = new ArrayList<>();
     }
 
     public int getReizigerId() {
@@ -58,9 +66,58 @@ public class OvChipkaart {
         this.saldo = saldo;
     }
 
-    @Override
-    public String toString() {
-        return " reiziger_id: " + reizigerId + " OV-chipkaart: "+ kaartNummer +  "," + geligTot + "," + klasse + "," + saldo ;
+    public ArrayList<Product> getProductenLijst() {
+        return productenLijst;
+    }
+
+    public void addProductToList(Product p){
+        if(!productenLijst.contains(p)){
+            productenLijst.add(p);
+        }
+        if(!p.getOvChipkaarten().contains(this)) {
+            p.addOvkaart(this);
+        }
 
     }
+
+    public void addProductList(ArrayList<Product> p){
+    this.productenLijst = p;
+
+    }
+
+    public void deleteProductFromList(Product p){
+        if(productenLijst.contains(p)){
+            productenLijst.remove(p);
+        }
+        if(p.getOvChipkaarten().contains(this)) {
+            p.deleteOvkaart(this);
+        }
+
+    }
+
+    @Override
+    public String toString() {
+        ArrayList product= new ArrayList<>();
+        for (Product p: productenLijst){
+            product.add(p.getProductNummer());
+        }
+
+        return "OvChipkaart{" +
+                "kaartNummer=" + kaartNummer +
+                ", geligTot=" + geligTot +
+                ", klasse=" + klasse +
+                ", saldo=" + saldo +
+                ", reizigerId=" + reizigerId +
+                ", productenLijst=" + product +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof  OvChipkaart){
+            if (((OvChipkaart) obj).getKaartNummer() == this.getKaartNummer()) {
+                return true;
+        }
+        }
+        return false;}
 }
