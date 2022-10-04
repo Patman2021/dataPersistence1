@@ -89,7 +89,7 @@ public class Product {
                 ", naam='" + naam + '\'' +
                 ", beschrijving='" + beschrijving + '\'' +
                 ", prijs=" + prijs +
-                ", ovChipkaartenList=" + ovChipkaartenList +
+                " \n , ovChipkaartenList=" + ovChipkaartenList +
                 '}';
     }
 }

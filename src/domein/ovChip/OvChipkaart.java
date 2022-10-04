@@ -109,7 +109,7 @@ public class OvChipkaart {
                 ", saldo=" + saldo +
                 ", reizigerId=" + reizigerId +
                 ", productenLijst=" + product +
-                '}';
+                "} \n ";
     }
 
     @Override
